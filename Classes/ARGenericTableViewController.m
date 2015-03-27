@@ -227,11 +227,19 @@
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
+    ARSectionData *data = [self.tableViewData sectionDataForSection:section];
+    if (data.headerIdentifier) {
+        return [self.tableView dequeueReusableHeaderFooterViewWithIdentifier:data.headerIdentifier];
+    }
     return [self.tableViewData sectionDataForSection:section].headerView;
 }
 
 - (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section
 {
+    ARSectionData *data = [self.tableViewData sectionDataForSection:section];
+    if (data.footerIdentifier) {
+        return [self.tableView dequeueReusableHeaderFooterViewWithIdentifier:data.footerIdentifier];
+    }
     return [self.tableViewData sectionDataForSection:section].footerView;
 }
 

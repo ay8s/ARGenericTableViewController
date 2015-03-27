@@ -28,16 +28,20 @@
 // header
 @property (nonatomic, strong)   NSString *headerTitle;
 @property (nonatomic, strong)   UIView *headerView;
-@property (nonatomic)           CGFloat headerHeight; // if the headerView is set its heigth is used
+@property (nonatomic)           CGFloat headerHeight; // if the headerView is set its height is used
 
 // footer
 @property (nonatomic, strong)   NSString *footerTitle;
 @property (nonatomic, strong)   UIView *footerView;
-@property (nonatomic)           CGFloat footerHeight; // if the footerView is set its heigth is used
+@property (nonatomic)           CGFloat footerHeight; // if the footerView is set its height is used
 
 // cells
 @property (nonatomic, strong, readonly)   NSArray *cellDataArray;
 @property (nonatomic, readonly)           NSUInteger cellCount;
+
+/// optionally support a reusable identifiers for header views
+@property (nonatomic, strong) NSString *headerIdentifier;
+@property (nonatomic, strong) NSString *footerIdentifier;
 
 - (id)initWithCellDataArray:(NSArray *)cellDataArray;
 - (ARCellData *)cellDataAtIndex:(NSUInteger)index;
