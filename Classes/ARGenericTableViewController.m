@@ -40,7 +40,7 @@
 {
     self = [super init];
     if (self) {
-        self.tableView = [[UITableView alloc] initWithFrame:CGRectZero style:style];
+        self.tableView = [[self.classForTableView alloc] initWithFrame:CGRectZero style:style];
         self.tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         [self setup];
     }
@@ -96,6 +96,11 @@
     } else {
         [self.tableViewCellClassDict setValue:Class forKey:identifier];
     }
+}
+
+- (Class)classForTableView
+{
+    return [UITableView class];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
