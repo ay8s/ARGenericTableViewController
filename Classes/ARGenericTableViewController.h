@@ -38,4 +38,7 @@
 // use this method to register Classes of the used TableViewCell (Sub)classes. This works also with iOS 5 
 - (void)registerClass:(Class)Class forCellReuseIdentifier:(NSString *)identifier;
 
+// override this method to use a custom tableview class
+- (Class)classForTableView;
+
 @end
