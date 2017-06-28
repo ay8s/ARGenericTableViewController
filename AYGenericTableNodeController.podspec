@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
-  s.name         = 'ARGenericTableViewController'
-  s.version      = '1.0.2'
+  s.name         = 'AYGenericCollectionNodeController'
+  s.version      = '1.0.0'
   s.license  = { :type => 'MIT'}
   s.summary      = 'iOS component to configure TableViews.'
   s.homepage = 'https://github.com/arconsis/ARGenericTableViewController'

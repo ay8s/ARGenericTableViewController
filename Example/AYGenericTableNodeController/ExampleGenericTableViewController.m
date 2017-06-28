@@ -7,7 +7,6 @@
 //
 
 #import "ExampleGenericTableViewController.h"
-#import "CustomCell.h"
 
 @implementation ExampleGenericTableViewController
 
@@ -77,12 +76,6 @@
             return cell;
         }];
         
-//        [cellData setCellConfigurationBlock:^(CustomCell *cell) {
-//            // called in cellForRowAtIndexpath
-//            cell.customLabel.text = [NSString stringWithFormat:@"Custom Cell %d", i];
-//            cell.customSwitch.on = i % 2;
-//        }];
-
         [cellData setCellSelectionBlock:^(ASTableNode *tableNode, NSIndexPath *indexPath) {
             // called in didSelectRowAtIndexPath
             UIAlertView *alert = [[UIAlertView alloc] init];

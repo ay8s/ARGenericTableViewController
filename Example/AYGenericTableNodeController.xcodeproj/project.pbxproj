@@ -17,7 +17,6 @@
 		D7ED5F76170EEC9A00DA7384 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = D7ED5F75170EEC9A00DA7384 /* Default.png */; };
 		D7ED5F78170EEC9A00DA7384 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D7ED5F77170EEC9A00DA7384 /* Default@2x.png */; };
 		D7ED5F7A170EEC9A00DA7384 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D7ED5F79170EEC9A00DA7384 /* Default-568h@2x.png */; };
-		D7ED5F86170EECEA00DA7384 /* CustomCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D7ED5F81170EECEA00DA7384 /* CustomCell.m */; };
 		D7ED5F87170EECEA00DA7384 /* ExampleGenericTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D7ED5F83170EECEA00DA7384 /* ExampleGenericTableViewController.m */; };
 		D7ED5F93170EED0800DA7384 /* AYCellData.m in Sources */ = {isa = PBXBuildFile; fileRef = D7ED5F8C170EED0800DA7384 /* AYCellData.m */; };
 		D7ED5F94170EED0800DA7384 /* AYGenericCollectionNodeController.m in Sources */ = {isa = PBXBuildFile; fileRef = D7ED5F8E170EED0800DA7384 /* AYGenericCollectionNodeController.m */; };
@@ -28,21 +27,19 @@
 /* Begin PBXFileReference section */
 		03E2893B3E3F624E5C357FAE /* Pods-AYGenericCollectionNodeController.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AYGenericCollectionNodeController.debug.xcconfig"; path = "Pods/Target Support Files/Pods-AYGenericCollectionNodeController/Pods-AYGenericCollectionNodeController.debug.xcconfig"; sourceTree = "<group>"; };
 		4BC823A2AFBCB2A9A38C75BA /* Pods-AYGenericCollectionNodeController.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AYGenericCollectionNodeController.release.xcconfig"; path = "Pods/Target Support Files/Pods-AYGenericCollectionNodeController/Pods-AYGenericCollectionNodeController.release.xcconfig"; sourceTree = "<group>"; };
-		D7ED5F60170EEC9A00DA7384 /* AYGenericCollectionNodeController.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AYGenericCollectionNodeController.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D7ED5F60170EEC9A00DA7384 /* AYGenericTableNodeController.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AYGenericTableNodeController.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D7ED5F63170EEC9A00DA7384 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		D7ED5F65170EEC9A00DA7384 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		D7ED5F67170EEC9A00DA7384 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
-		D7ED5F6B170EEC9A00DA7384 /* AYGenericCollectionNodeController-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "AYGenericCollectionNodeController-Info.plist"; sourceTree = "<group>"; };
+		D7ED5F6B170EEC9A00DA7384 /* AYGenericTableNodeController-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "AYGenericTableNodeController-Info.plist"; sourceTree = "<group>"; };
 		D7ED5F6D170EEC9A00DA7384 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		D7ED5F6F170EEC9A00DA7384 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		D7ED5F71170EEC9A00DA7384 /* AYGenericCollectionNodeController-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AYGenericCollectionNodeController-Prefix.pch"; sourceTree = "<group>"; };
+		D7ED5F71170EEC9A00DA7384 /* AYGenericTableNodeController-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AYGenericTableNodeController-Prefix.pch"; sourceTree = "<group>"; };
 		D7ED5F72170EEC9A00DA7384 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		D7ED5F73170EEC9A00DA7384 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		D7ED5F75170EEC9A00DA7384 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
 		D7ED5F77170EEC9A00DA7384 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
 		D7ED5F79170EEC9A00DA7384 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
-		D7ED5F80170EECEA00DA7384 /* CustomCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomCell.h; sourceTree = "<group>"; };
-		D7ED5F81170EECEA00DA7384 /* CustomCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomCell.m; sourceTree = "<group>"; };
 		D7ED5F82170EECEA00DA7384 /* ExampleGenericTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExampleGenericTableViewController.h; sourceTree = "<group>"; };
 		D7ED5F83170EECEA00DA7384 /* ExampleGenericTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExampleGenericTableViewController.m; sourceTree = "<group>"; };
 		D7ED5F8B170EED0800DA7384 /* AYCellData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AYCellData.h; sourceTree = "<group>"; };
@@ -94,7 +91,7 @@
 		D7ED5F61170EEC9A00DA7384 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				D7ED5F60170EEC9A00DA7384 /* AYGenericCollectionNodeController.app */,
+				D7ED5F60170EEC9A00DA7384 /* AYGenericTableNodeController.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -117,21 +114,19 @@
 				D7ED5F73170EEC9A00DA7384 /* AppDelegate.m */,
 				D7ED5F82170EECEA00DA7384 /* ExampleGenericTableViewController.h */,
 				D7ED5F83170EECEA00DA7384 /* ExampleGenericTableViewController.m */,
-				D7ED5F80170EECEA00DA7384 /* CustomCell.h */,
-				D7ED5F81170EECEA00DA7384 /* CustomCell.m */,
 				D7ED5F6A170EEC9A00DA7384 /* Supporting Files */,
 			);
 			name = Example;
-			path = AYGenericCollectionNodeController;
+			path = AYGenericTableNodeController;
 			sourceTree = "<group>";
 		};
 		D7ED5F6A170EEC9A00DA7384 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				D7ED5F6B170EEC9A00DA7384 /* AYGenericCollectionNodeController-Info.plist */,
+				D7ED5F6B170EEC9A00DA7384 /* AYGenericTableNodeController-Info.plist */,
 				D7ED5F6C170EEC9A00DA7384 /* InfoPlist.strings */,
 				D7ED5F6F170EEC9A00DA7384 /* main.m */,
-				D7ED5F71170EEC9A00DA7384 /* AYGenericCollectionNodeController-Prefix.pch */,
+				D7ED5F71170EEC9A00DA7384 /* AYGenericTableNodeController-Prefix.pch */,
 				D7ED5F75170EEC9A00DA7384 /* Default.png */,
 				D7ED5F77170EEC9A00DA7384 /* Default@2x.png */,
 				D7ED5F79170EEC9A00DA7384 /* Default-568h@2x.png */,
@@ -158,9 +153,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		D7ED5F5F170EEC9A00DA7384 /* AYGenericCollectionNodeController */ = {
+		D7ED5F5F170EEC9A00DA7384 /* AYGenericTableNodeController */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = D7ED5F7D170EEC9A00DA7384 /* Build configuration list for PBXNativeTarget "AYGenericCollectionNodeController" */;
+			buildConfigurationList = D7ED5F7D170EEC9A00DA7384 /* Build configuration list for PBXNativeTarget "AYGenericTableNodeController" */;
 			buildPhases = (
 				2002F2BDBB6FD57EB753769D /* [CP] Check Pods Manifest.lock */,
 				D7ED5F5C170EEC9A00DA7384 /* Sources */,
@@ -173,9 +168,9 @@
 			);
 			dependencies = (
 			);
-			name = AYGenericCollectionNodeController;
+			name = AYGenericTableNodeController;
 			productName = ARGenericTableViewController;
-			productReference = D7ED5F60170EEC9A00DA7384 /* AYGenericCollectionNodeController.app */;
+			productReference = D7ED5F60170EEC9A00DA7384 /* AYGenericTableNodeController.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -187,7 +182,7 @@
 				LastUpgradeCheck = 0460;
 				ORGANIZATIONNAME = "arconsis IT-Solutions GmbH";
 			};
-			buildConfigurationList = D7ED5F5B170EEC9A00DA7384 /* Build configuration list for PBXProject "AYGenericCollectionNodeController" */;
+			buildConfigurationList = D7ED5F5B170EEC9A00DA7384 /* Build configuration list for PBXProject "AYGenericTableNodeController" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -199,7 +194,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				D7ED5F5F170EEC9A00DA7384 /* AYGenericCollectionNodeController */,
+				D7ED5F5F170EEC9A00DA7384 /* AYGenericTableNodeController */,
 			);
 		};
 /* End PBXProject section */
@@ -273,7 +268,6 @@
 			files = (
 				D7ED5F70170EEC9A00DA7384 /* main.m in Sources */,
 				D7ED5F74170EEC9A00DA7384 /* AppDelegate.m in Sources */,
-				D7ED5F86170EECEA00DA7384 /* CustomCell.m in Sources */,
 				D7ED5F87170EECEA00DA7384 /* ExampleGenericTableViewController.m in Sources */,
 				D7ED5F93170EED0800DA7384 /* AYCellData.m in Sources */,
 				D7ED5F94170EED0800DA7384 /* AYGenericCollectionNodeController.m in Sources */,
@@ -359,9 +353,9 @@
 			baseConfigurationReference = 03E2893B3E3F624E5C357FAE /* Pods-AYGenericCollectionNodeController.debug.xcconfig */;
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "AYGenericCollectionNodeController/AYGenericCollectionNodeController-Prefix.pch";
-				INFOPLIST_FILE = "$(SRCROOT)/AYGenericCollectionNodeController/AYGenericCollectionNodeController-Info.plist";
-				PRODUCT_BUNDLE_IDENTIFIER = com.andydev.AYGenericCollectionNodeController;
+				GCC_PREFIX_HEADER = "AYGenericTableNodeController/AYGenericTableNodeController-Prefix.pch";
+				INFOPLIST_FILE = "$(SRCROOT)/AYGenericTableNodeController/AYGenericTableNodeController-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = com.andydev.AYGenericTableNodeController;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -372,9 +366,9 @@
 			baseConfigurationReference = 4BC823A2AFBCB2A9A38C75BA /* Pods-AYGenericCollectionNodeController.release.xcconfig */;
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "AYGenericCollectionNodeController/AYGenericCollectionNodeController-Prefix.pch";
-				INFOPLIST_FILE = "$(SRCROOT)/AYGenericCollectionNodeController/AYGenericCollectionNodeController-Info.plist";
-				PRODUCT_BUNDLE_IDENTIFIER = com.andydev.AYGenericCollectionNodeController;
+				GCC_PREFIX_HEADER = "AYGenericTableNodeController/AYGenericTableNodeController-Prefix.pch";
+				INFOPLIST_FILE = "$(SRCROOT)/AYGenericTableNodeController/AYGenericTableNodeController-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = com.andydev.AYGenericTableNodeController;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -383,7 +377,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		D7ED5F5B170EEC9A00DA7384 /* Build configuration list for PBXProject "AYGenericCollectionNodeController" */ = {
+		D7ED5F5B170EEC9A00DA7384 /* Build configuration list for PBXProject "AYGenericTableNodeController" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				D7ED5F7B170EEC9A00DA7384 /* Debug */,
@@ -392,7 +386,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		D7ED5F7D170EEC9A00DA7384 /* Build configuration list for PBXNativeTarget "AYGenericCollectionNodeController" */ = {
+		D7ED5F7D170EEC9A00DA7384 /* Build configuration list for PBXNativeTarget "AYGenericTableNodeController" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				D7ED5F7E170EEC9A00DA7384 /* Debug */,
