@@ -1,0 +1,407 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		87F18255CC50E68286F9CF46 /* libPods-AYGenericCollectionNodeController.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC9491039A33B13A0BB4417A /* libPods-AYGenericCollectionNodeController.a */; };
+		D7ED5F64170EEC9A00DA7384 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D7ED5F63170EEC9A00DA7384 /* UIKit.framework */; };
+		D7ED5F66170EEC9A00DA7384 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D7ED5F65170EEC9A00DA7384 /* Foundation.framework */; };
+		D7ED5F68170EEC9A00DA7384 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D7ED5F67170EEC9A00DA7384 /* CoreGraphics.framework */; };
+		D7ED5F6E170EEC9A00DA7384 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D7ED5F6C170EEC9A00DA7384 /* InfoPlist.strings */; };
+		D7ED5F70170EEC9A00DA7384 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D7ED5F6F170EEC9A00DA7384 /* main.m */; };
+		D7ED5F74170EEC9A00DA7384 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D7ED5F73170EEC9A00DA7384 /* AppDelegate.m */; };
+		D7ED5F76170EEC9A00DA7384 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = D7ED5F75170EEC9A00DA7384 /* Default.png */; };
+		D7ED5F78170EEC9A00DA7384 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D7ED5F77170EEC9A00DA7384 /* Default@2x.png */; };
+		D7ED5F7A170EEC9A00DA7384 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D7ED5F79170EEC9A00DA7384 /* Default-568h@2x.png */; };
+		D7ED5F86170EECEA00DA7384 /* CustomCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D7ED5F81170EECEA00DA7384 /* CustomCell.m */; };
+		D7ED5F87170EECEA00DA7384 /* ExampleGenericTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D7ED5F83170EECEA00DA7384 /* ExampleGenericTableViewController.m */; };
+		D7ED5F93170EED0800DA7384 /* AYCellData.m in Sources */ = {isa = PBXBuildFile; fileRef = D7ED5F8C170EED0800DA7384 /* AYCellData.m */; };
+		D7ED5F94170EED0800DA7384 /* AYGenericCollectionNodeController.m in Sources */ = {isa = PBXBuildFile; fileRef = D7ED5F8E170EED0800DA7384 /* AYGenericCollectionNodeController.m */; };
+		D7ED5F95170EED0800DA7384 /* AYSectionData.m in Sources */ = {isa = PBXBuildFile; fileRef = D7ED5F90170EED0800DA7384 /* AYSectionData.m */; };
+		D7ED5F96170EED0800DA7384 /* AYTableNodeData.m in Sources */ = {isa = PBXBuildFile; fileRef = D7ED5F92170EED0800DA7384 /* AYTableNodeData.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		03E2893B3E3F624E5C357FAE /* Pods-AYGenericCollectionNodeController.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AYGenericCollectionNodeController.debug.xcconfig"; path = "Pods/Target Support Files/Pods-AYGenericCollectionNodeController/Pods-AYGenericCollectionNodeController.debug.xcconfig"; sourceTree = "<group>"; };
+		4BC823A2AFBCB2A9A38C75BA /* Pods-AYGenericCollectionNodeController.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AYGenericCollectionNodeController.release.xcconfig"; path = "Pods/Target Support Files/Pods-AYGenericCollectionNodeController/Pods-AYGenericCollectionNodeController.release.xcconfig"; sourceTree = "<group>"; };
+		D7ED5F60170EEC9A00DA7384 /* AYGenericCollectionNodeController.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AYGenericCollectionNodeController.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D7ED5F63170EEC9A00DA7384 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		D7ED5F65170EEC9A00DA7384 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		D7ED5F67170EEC9A00DA7384 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		D7ED5F6B170EEC9A00DA7384 /* AYGenericCollectionNodeController-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "AYGenericCollectionNodeController-Info.plist"; sourceTree = "<group>"; };
+		D7ED5F6D170EEC9A00DA7384 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		D7ED5F6F170EEC9A00DA7384 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		D7ED5F71170EEC9A00DA7384 /* AYGenericCollectionNodeController-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AYGenericCollectionNodeController-Prefix.pch"; sourceTree = "<group>"; };
+		D7ED5F72170EEC9A00DA7384 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		D7ED5F73170EEC9A00DA7384 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		D7ED5F75170EEC9A00DA7384 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
+		D7ED5F77170EEC9A00DA7384 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
+		D7ED5F79170EEC9A00DA7384 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
+		D7ED5F80170EECEA00DA7384 /* CustomCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomCell.h; sourceTree = "<group>"; };
+		D7ED5F81170EECEA00DA7384 /* CustomCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomCell.m; sourceTree = "<group>"; };
+		D7ED5F82170EECEA00DA7384 /* ExampleGenericTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExampleGenericTableViewController.h; sourceTree = "<group>"; };
+		D7ED5F83170EECEA00DA7384 /* ExampleGenericTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExampleGenericTableViewController.m; sourceTree = "<group>"; };
+		D7ED5F8B170EED0800DA7384 /* AYCellData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AYCellData.h; sourceTree = "<group>"; };
+		D7ED5F8C170EED0800DA7384 /* AYCellData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AYCellData.m; sourceTree = "<group>"; };
+		D7ED5F8D170EED0800DA7384 /* AYGenericCollectionNodeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AYGenericCollectionNodeController.h; sourceTree = "<group>"; };
+		D7ED5F8E170EED0800DA7384 /* AYGenericCollectionNodeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AYGenericCollectionNodeController.m; sourceTree = "<group>"; };
+		D7ED5F8F170EED0800DA7384 /* AYSectionData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AYSectionData.h; sourceTree = "<group>"; };
+		D7ED5F90170EED0800DA7384 /* AYSectionData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AYSectionData.m; sourceTree = "<group>"; };
+		D7ED5F91170EED0800DA7384 /* AYTableNodeData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AYTableNodeData.h; sourceTree = "<group>"; };
+		D7ED5F92170EED0800DA7384 /* AYTableNodeData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AYTableNodeData.m; sourceTree = "<group>"; };
+		EC9491039A33B13A0BB4417A /* libPods-AYGenericCollectionNodeController.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-AYGenericCollectionNodeController.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D7ED5F5D170EEC9A00DA7384 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D7ED5F64170EEC9A00DA7384 /* UIKit.framework in Frameworks */,
+				D7ED5F66170EEC9A00DA7384 /* Foundation.framework in Frameworks */,
+				D7ED5F68170EEC9A00DA7384 /* CoreGraphics.framework in Frameworks */,
+				87F18255CC50E68286F9CF46 /* libPods-AYGenericCollectionNodeController.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		99BA934FF9CF74605CEFE060 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				03E2893B3E3F624E5C357FAE /* Pods-AYGenericCollectionNodeController.debug.xcconfig */,
+				4BC823A2AFBCB2A9A38C75BA /* Pods-AYGenericCollectionNodeController.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		D7ED5F57170EEC9A00DA7384 = {
+			isa = PBXGroup;
+			children = (
+				D7ED5F8A170EED0800DA7384 /* AYGenericCollectionNodeController */,
+				D7ED5F69170EEC9A00DA7384 /* Example */,
+				D7ED5F62170EEC9A00DA7384 /* Frameworks */,
+				D7ED5F61170EEC9A00DA7384 /* Products */,
+				99BA934FF9CF74605CEFE060 /* Pods */,
+			);
+			sourceTree = "<group>";
+		};
+		D7ED5F61170EEC9A00DA7384 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D7ED5F60170EEC9A00DA7384 /* AYGenericCollectionNodeController.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D7ED5F62170EEC9A00DA7384 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				D7ED5F63170EEC9A00DA7384 /* UIKit.framework */,
+				D7ED5F65170EEC9A00DA7384 /* Foundation.framework */,
+				D7ED5F67170EEC9A00DA7384 /* CoreGraphics.framework */,
+				EC9491039A33B13A0BB4417A /* libPods-AYGenericCollectionNodeController.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		D7ED5F69170EEC9A00DA7384 /* Example */ = {
+			isa = PBXGroup;
+			children = (
+				D7ED5F72170EEC9A00DA7384 /* AppDelegate.h */,
+				D7ED5F73170EEC9A00DA7384 /* AppDelegate.m */,
+				D7ED5F82170EECEA00DA7384 /* ExampleGenericTableViewController.h */,
+				D7ED5F83170EECEA00DA7384 /* ExampleGenericTableViewController.m */,
+				D7ED5F80170EECEA00DA7384 /* CustomCell.h */,
+				D7ED5F81170EECEA00DA7384 /* CustomCell.m */,
+				D7ED5F6A170EEC9A00DA7384 /* Supporting Files */,
+			);
+			name = Example;
+			path = AYGenericCollectionNodeController;
+			sourceTree = "<group>";
+		};
+		D7ED5F6A170EEC9A00DA7384 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				D7ED5F6B170EEC9A00DA7384 /* AYGenericCollectionNodeController-Info.plist */,
+				D7ED5F6C170EEC9A00DA7384 /* InfoPlist.strings */,
+				D7ED5F6F170EEC9A00DA7384 /* main.m */,
+				D7ED5F71170EEC9A00DA7384 /* AYGenericCollectionNodeController-Prefix.pch */,
+				D7ED5F75170EEC9A00DA7384 /* Default.png */,
+				D7ED5F77170EEC9A00DA7384 /* Default@2x.png */,
+				D7ED5F79170EEC9A00DA7384 /* Default-568h@2x.png */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		D7ED5F8A170EED0800DA7384 /* AYGenericCollectionNodeController */ = {
+			isa = PBXGroup;
+			children = (
+				D7ED5F8D170EED0800DA7384 /* AYGenericCollectionNodeController.h */,
+				D7ED5F8E170EED0800DA7384 /* AYGenericCollectionNodeController.m */,
+				D7ED5F91170EED0800DA7384 /* AYTableNodeData.h */,
+				D7ED5F92170EED0800DA7384 /* AYTableNodeData.m */,
+				D7ED5F8F170EED0800DA7384 /* AYSectionData.h */,
+				D7ED5F90170EED0800DA7384 /* AYSectionData.m */,
+				D7ED5F8B170EED0800DA7384 /* AYCellData.h */,
+				D7ED5F8C170EED0800DA7384 /* AYCellData.m */,
+			);
+			name = AYGenericCollectionNodeController;
+			path = ../Classes;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		D7ED5F5F170EEC9A00DA7384 /* AYGenericCollectionNodeController */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D7ED5F7D170EEC9A00DA7384 /* Build configuration list for PBXNativeTarget "AYGenericCollectionNodeController" */;
+			buildPhases = (
+				2002F2BDBB6FD57EB753769D /* [CP] Check Pods Manifest.lock */,
+				D7ED5F5C170EEC9A00DA7384 /* Sources */,
+				D7ED5F5D170EEC9A00DA7384 /* Frameworks */,
+				D7ED5F5E170EEC9A00DA7384 /* Resources */,
+				5C506D811FD56A5D7EA40626 /* [CP] Embed Pods Frameworks */,
+				5AD00B9D8E29B65A1552BBA2 /* [CP] Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AYGenericCollectionNodeController;
+			productName = ARGenericTableViewController;
+			productReference = D7ED5F60170EEC9A00DA7384 /* AYGenericCollectionNodeController.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D7ED5F58170EEC9A00DA7384 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0460;
+				ORGANIZATIONNAME = "arconsis IT-Solutions GmbH";
+			};
+			buildConfigurationList = D7ED5F5B170EEC9A00DA7384 /* Build configuration list for PBXProject "AYGenericCollectionNodeController" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = D7ED5F57170EEC9A00DA7384;
+			productRefGroup = D7ED5F61170EEC9A00DA7384 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D7ED5F5F170EEC9A00DA7384 /* AYGenericCollectionNodeController */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		D7ED5F5E170EEC9A00DA7384 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D7ED5F6E170EEC9A00DA7384 /* InfoPlist.strings in Resources */,
+				D7ED5F76170EEC9A00DA7384 /* Default.png in Resources */,
+				D7ED5F78170EEC9A00DA7384 /* Default@2x.png in Resources */,
+				D7ED5F7A170EEC9A00DA7384 /* Default-568h@2x.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		2002F2BDBB6FD57EB753769D /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		5AD00B9D8E29B65A1552BBA2 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-AYGenericCollectionNodeController/Pods-AYGenericCollectionNodeController-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		5C506D811FD56A5D7EA40626 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-AYGenericCollectionNodeController/Pods-AYGenericCollectionNodeController-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D7ED5F5C170EEC9A00DA7384 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D7ED5F70170EEC9A00DA7384 /* main.m in Sources */,
+				D7ED5F74170EEC9A00DA7384 /* AppDelegate.m in Sources */,
+				D7ED5F86170EECEA00DA7384 /* CustomCell.m in Sources */,
+				D7ED5F87170EECEA00DA7384 /* ExampleGenericTableViewController.m in Sources */,
+				D7ED5F93170EED0800DA7384 /* AYCellData.m in Sources */,
+				D7ED5F94170EED0800DA7384 /* AYGenericCollectionNodeController.m in Sources */,
+				D7ED5F95170EED0800DA7384 /* AYSectionData.m in Sources */,
+				D7ED5F96170EED0800DA7384 /* AYTableNodeData.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		D7ED5F6C170EEC9A00DA7384 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D7ED5F6D170EEC9A00DA7384 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		D7ED5F7B170EEC9A00DA7384 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		D7ED5F7C170EEC9A00DA7384 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		D7ED5F7E170EEC9A00DA7384 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 03E2893B3E3F624E5C357FAE /* Pods-AYGenericCollectionNodeController.debug.xcconfig */;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "AYGenericCollectionNodeController/AYGenericCollectionNodeController-Prefix.pch";
+				INFOPLIST_FILE = "$(SRCROOT)/AYGenericCollectionNodeController/AYGenericCollectionNodeController-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = com.andydev.AYGenericCollectionNodeController;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		D7ED5F7F170EEC9A00DA7384 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4BC823A2AFBCB2A9A38C75BA /* Pods-AYGenericCollectionNodeController.release.xcconfig */;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "AYGenericCollectionNodeController/AYGenericCollectionNodeController-Prefix.pch";
+				INFOPLIST_FILE = "$(SRCROOT)/AYGenericCollectionNodeController/AYGenericCollectionNodeController-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = com.andydev.AYGenericCollectionNodeController;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D7ED5F5B170EEC9A00DA7384 /* Build configuration list for PBXProject "AYGenericCollectionNodeController" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D7ED5F7B170EEC9A00DA7384 /* Debug */,
+				D7ED5F7C170EEC9A00DA7384 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D7ED5F7D170EEC9A00DA7384 /* Build configuration list for PBXNativeTarget "AYGenericCollectionNodeController" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D7ED5F7E170EEC9A00DA7384 /* Debug */,
+				D7ED5F7F170EEC9A00DA7384 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D7ED5F58170EEC9A00DA7384 /* Project object */;
+}

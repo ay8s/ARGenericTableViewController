@@ -1,3 +1,0 @@
-platform :ios
-
-podspec :podspec => "../ARGenericTableViewController.podspec"
