@@ -21,14 +21,14 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#import "AYGenericCollectionNodeController.h"
+#import "AYGenericTableNodeController.h"
 
-@interface AYGenericCollectionNodeController ()
+@interface AYGenericTableNodeController ()
 @property (nonatomic, strong) UIBarButtonItem *internalEditButtonItem;
 @property (nonatomic, strong) NSMutableDictionary *tableViewCellClassDict;
 @end
 
-@implementation AYGenericCollectionNodeController
+@implementation AYGenericTableNodeController
 
 - (void)setup {
     self.animateChanges = NO;

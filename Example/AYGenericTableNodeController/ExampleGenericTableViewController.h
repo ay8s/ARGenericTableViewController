@@ -6,8 +6,8 @@
 //  Copyright (c) 2013 arconsis IT-Solutions GmbH. All rights reserved.
 //
 
-#import "AYGenericCollectionNodeController.h"
+#import "AYGenericTableNodeController.h"
 
-@interface ExampleGenericTableViewController : AYGenericCollectionNodeController
+@interface ExampleGenericTableViewController : AYGenericTableNodeController
 
 @end

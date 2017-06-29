@@ -19,7 +19,7 @@
 		D7ED5F7A170EEC9A00DA7384 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D7ED5F79170EEC9A00DA7384 /* Default-568h@2x.png */; };
 		D7ED5F87170EECEA00DA7384 /* ExampleGenericTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D7ED5F83170EECEA00DA7384 /* ExampleGenericTableViewController.m */; };
 		D7ED5F93170EED0800DA7384 /* AYCellData.m in Sources */ = {isa = PBXBuildFile; fileRef = D7ED5F8C170EED0800DA7384 /* AYCellData.m */; };
-		D7ED5F94170EED0800DA7384 /* AYGenericCollectionNodeController.m in Sources */ = {isa = PBXBuildFile; fileRef = D7ED5F8E170EED0800DA7384 /* AYGenericCollectionNodeController.m */; };
+		D7ED5F94170EED0800DA7384 /* AYGenericTableNodeController.m in Sources */ = {isa = PBXBuildFile; fileRef = D7ED5F8E170EED0800DA7384 /* AYGenericTableNodeController.m */; };
 		D7ED5F95170EED0800DA7384 /* AYSectionData.m in Sources */ = {isa = PBXBuildFile; fileRef = D7ED5F90170EED0800DA7384 /* AYSectionData.m */; };
 		D7ED5F96170EED0800DA7384 /* AYTableNodeData.m in Sources */ = {isa = PBXBuildFile; fileRef = D7ED5F92170EED0800DA7384 /* AYTableNodeData.m */; };
 /* End PBXBuildFile section */
@@ -44,8 +44,8 @@
 		D7ED5F83170EECEA00DA7384 /* ExampleGenericTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExampleGenericTableViewController.m; sourceTree = "<group>"; };
 		D7ED5F8B170EED0800DA7384 /* AYCellData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AYCellData.h; sourceTree = "<group>"; };
 		D7ED5F8C170EED0800DA7384 /* AYCellData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AYCellData.m; sourceTree = "<group>"; };
-		D7ED5F8D170EED0800DA7384 /* AYGenericCollectionNodeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AYGenericCollectionNodeController.h; sourceTree = "<group>"; };
-		D7ED5F8E170EED0800DA7384 /* AYGenericCollectionNodeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AYGenericCollectionNodeController.m; sourceTree = "<group>"; };
+		D7ED5F8D170EED0800DA7384 /* AYGenericTableNodeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AYGenericTableNodeController.h; sourceTree = "<group>"; };
+		D7ED5F8E170EED0800DA7384 /* AYGenericTableNodeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AYGenericTableNodeController.m; sourceTree = "<group>"; };
 		D7ED5F8F170EED0800DA7384 /* AYSectionData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AYSectionData.h; sourceTree = "<group>"; };
 		D7ED5F90170EED0800DA7384 /* AYSectionData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AYSectionData.m; sourceTree = "<group>"; };
 		D7ED5F91170EED0800DA7384 /* AYTableNodeData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AYTableNodeData.h; sourceTree = "<group>"; };
@@ -137,8 +137,8 @@
 		D7ED5F8A170EED0800DA7384 /* AYGenericCollectionNodeController */ = {
 			isa = PBXGroup;
 			children = (
-				D7ED5F8D170EED0800DA7384 /* AYGenericCollectionNodeController.h */,
-				D7ED5F8E170EED0800DA7384 /* AYGenericCollectionNodeController.m */,
+				D7ED5F8D170EED0800DA7384 /* AYGenericTableNodeController.h */,
+				D7ED5F8E170EED0800DA7384 /* AYGenericTableNodeController.m */,
 				D7ED5F91170EED0800DA7384 /* AYTableNodeData.h */,
 				D7ED5F92170EED0800DA7384 /* AYTableNodeData.m */,
 				D7ED5F8F170EED0800DA7384 /* AYSectionData.h */,
@@ -270,7 +270,7 @@
 				D7ED5F74170EEC9A00DA7384 /* AppDelegate.m in Sources */,
 				D7ED5F87170EECEA00DA7384 /* ExampleGenericTableViewController.m in Sources */,
 				D7ED5F93170EED0800DA7384 /* AYCellData.m in Sources */,
-				D7ED5F94170EED0800DA7384 /* AYGenericCollectionNodeController.m in Sources */,
+				D7ED5F94170EED0800DA7384 /* AYGenericTableNodeController.m in Sources */,
 				D7ED5F95170EED0800DA7384 /* AYSectionData.m in Sources */,
 				D7ED5F96170EED0800DA7384 /* AYTableNodeData.m in Sources */,
 			);
