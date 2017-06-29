@@ -1,5 +1,5 @@
 Pod::Spec.new do |s|
-  s.name         = 'AYGenericCollectionNodeController'
+  s.name         = 'AYGenericTableNodeController'
   s.version      = '1.0.0'
   s.license  = { :type => 'MIT'}
   s.summary      = 'iOS component to configure TableViews.'
