@@ -14,4 +14,5 @@ Pod::Spec.new do |s|
   s.platform = :ios,'5.0'
   s.source_files = 'Classes', 'Classes/**/*.{h,m}'
   s.requires_arc = true
+  s.dependency 'Texture'
 end
