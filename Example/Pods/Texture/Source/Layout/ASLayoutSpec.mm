@@ -2,17 +2,9 @@
 //  ASLayoutSpec.mm
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <AsyncDisplayKit/ASLayoutSpec.h>
@@ -20,31 +12,15 @@
 
 #import <AsyncDisplayKit/ASLayoutSpec+Subclasses.h>
 
+#import <AsyncDisplayKit/ASCollections.h>
 #import <AsyncDisplayKit/ASLayoutElementStylePrivate.h>
-#import <AsyncDisplayKit/ASTraitCollection.h>
 #import <AsyncDisplayKit/ASEqualityHelpers.h>
-#import <AsyncDisplayKit/ASInternalHelpers.h>
-
-#import <objc/runtime.h>
-#import <map>
-#import <vector>
 
 @implementation ASLayoutSpec
 
 // Dynamic properties for ASLayoutElements
 @dynamic layoutElementType;
 @synthesize debugName = _debugName;
-
-#pragma mark - Class
-
-+ (void)initialize
-{
-  [super initialize];
-  if (self != [ASLayoutSpec class]) {
-    ASDisplayNodeAssert(!ASSubclassOverridesSelector([ASLayoutSpec class], self, @selector(measureWithSizeRange:)), @"Subclass %@ must not override measureWithSizeRange: method. Instead override calculateLayoutThatFits:", NSStringFromClass(self));
-  }
-}
-
 
 #pragma mark - Lifecycle
 
@@ -71,11 +47,16 @@
   return YES;
 }
 
+- (BOOL)implementsLayoutMethod
+{
+  return YES;
+}
+
 #pragma mark - Style
 
 - (ASLayoutElementStyle *)style
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  AS::MutexLocker l(__instanceLock__);
   if (_style == nil) {
     _style = [[ASLayoutElementStyle alloc] init];
   }
@@ -126,14 +107,12 @@ ASLayoutElementLayoutCalculationDefaults
 {
   ASDisplayNodeAssert(self.isMutable, @"Cannot set properties when layout spec is not mutable");
 
-  [_childrenArray removeAllObjects];
-  
-  NSUInteger i = 0;
+#if ASDISPLAYNODE_ASSERTIONS_ENABLED
   for (id<ASLayoutElement> child in children) {
     ASDisplayNodeAssert([child conformsToProtocol:NSProtocolFromString(@"ASLayoutElement")], @"Child %@ of spec %@ is not an ASLayoutElement!", child, self);
-    _childrenArray[i] = child;
-    i += 1;
   }
+#endif
+  [_childrenArray setArray:children];
 }
 
 - (nullable NSArray<id<ASLayoutElement>> *)children
@@ -148,7 +127,7 @@ ASLayoutElementLayoutCalculationDefaults
 
 #pragma mark - NSFastEnumeration
 
-- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained _Nullable [_Nonnull])buffer count:(NSUInteger)len
+- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id unowned _Nullable [_Nonnull])buffer count:(NSUInteger)len
 {
   return [_childrenArray countByEnumeratingWithState:state objects:buffer count:len];
 }
@@ -157,24 +136,52 @@ ASLayoutElementLayoutCalculationDefaults
 
 - (ASTraitCollection *)asyncTraitCollection
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  AS::MutexLocker l(__instanceLock__);
   return [ASTraitCollection traitCollectionWithASPrimitiveTraitCollection:self.primitiveTraitCollection];
 }
 
-ASPrimitiveTraitCollectionDefaults
-ASPrimitiveTraitCollectionDeprecatedImplementation
+- (ASPrimitiveTraitCollection)primitiveTraitCollection
+{
+  AS::MutexLocker l(__instanceLock__);
+  return _primitiveTraitCollection;
+}
+
+- (void)setPrimitiveTraitCollection:(ASPrimitiveTraitCollection)traitCollection
+{
+  AS::MutexLocker l(__instanceLock__);
+  _primitiveTraitCollection = traitCollection;
+}
 
 #pragma mark - ASLayoutElementStyleExtensibility
 
 ASLayoutElementStyleExtensibilityForwarding
 
+#pragma mark - ASDescriptionProvider
+
+- (NSMutableArray<NSDictionary *> *)propertiesForDescription
+{
+  const auto result = [NSMutableArray<NSDictionary *> array];
+  if (NSArray *children = self.children) {
+    // Use tiny descriptions because these trees can get nested very deep.
+    const auto tinyDescriptions = ASArrayByFlatMapping(children, id object, ASObjectDescriptionMakeTiny(object));
+    [result addObject:@{ @"children": tinyDescriptions }];
+  }
+  return result;
+}
+
+- (NSString *)description
+{
+  return ASObjectDescriptionMake(self, [self propertiesForDescription]);
+}
+
 #pragma mark - Framework Private
 
-- (nullable NSSet<id<ASLayoutElement>> *)findDuplicatedElementsInSubtree
+#if AS_DEDUPE_LAYOUT_SPEC_TREE
+- (nullable NSHashTable<id<ASLayoutElement>> *)findDuplicatedElementsInSubtree
 {
-  NSMutableSet *result = nil;
+  NSHashTable *result = nil;
   NSUInteger count = 0;
-  [self _findDuplicatedElementsInSubtreeWithWorkingSet:[[NSMutableSet alloc] init] workingCount:&count result:&result];
+  [self _findDuplicatedElementsInSubtreeWithWorkingSet:[NSHashTable hashTableWithOptions:NSHashTableObjectPointerPersonality] workingCount:&count result:&result];
   return result;
 }
 
@@ -185,7 +192,7 @@ ASLayoutElementStyleExtensibilityForwarding
  * @param workingCount The current count of the set for use in the recursion.
  * @param result The set into which to put the result. This initially points to @c nil to save time if no duplicates exist.
  */
-- (void)_findDuplicatedElementsInSubtreeWithWorkingSet:(NSMutableSet<id<ASLayoutElement>> *)workingSet workingCount:(NSUInteger *)workingCount result:(NSMutableSet<id<ASLayoutElement>>  * _Nullable *)result
+- (void)_findDuplicatedElementsInSubtreeWithWorkingSet:(NSHashTable<id<ASLayoutElement>> *)workingSet workingCount:(NSUInteger *)workingCount result:(NSHashTable<id<ASLayoutElement>>  * _Nullable *)result
 {
   Class layoutSpecClass = [ASLayoutSpec class];
 
@@ -200,7 +207,7 @@ ASLayoutElementStyleExtensibilityForwarding
     BOOL objectAlreadyExisted = (newCount != oldCount + 1);
     if (objectAlreadyExisted) {
       if (*result == nil) {
-        *result = [[NSMutableSet alloc] init];
+        *result = [NSHashTable hashTableWithOptions:NSHashTableObjectPointerPersonality];
       }
       [*result addObject:child];
     } else {
@@ -212,22 +219,42 @@ ASLayoutElementStyleExtensibilityForwarding
     }
   }
 }
+#endif
 
 #pragma mark - Debugging
 
 - (NSString *)debugName
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  AS::MutexLocker l(__instanceLock__);
   return _debugName;
 }
 
 - (void)setDebugName:(NSString *)debugName
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  AS::MutexLocker l(__instanceLock__);
   if (!ASObjectIsEqual(_debugName, debugName)) {
     _debugName = [debugName copy];
   }
 }
+
+#pragma mark - ASLayoutElementAsciiArtProtocol
+
+- (NSString *)asciiArtString
+{
+  NSArray *children = self.children.count < 2 && self.child ? @[self.child] : self.children;
+  return [ASLayoutSpec asciiArtStringForChildren:children parentName:[self asciiArtName]];
+}
+
+- (NSString *)asciiArtName
+{
+  NSMutableString *result = [NSMutableString stringWithCString:object_getClassName(self) encoding:NSASCIIStringEncoding];
+  if (_debugName) {
+    [result appendFormat:@" (%@)", _debugName];
+  }
+  return result;
+}
+
+ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
 
 @end
 
@@ -235,7 +262,7 @@ ASLayoutElementStyleExtensibilityForwarding
 
 @implementation ASWrapperLayoutSpec
 
-+ (instancetype)wrapperWithLayoutElement:(id<ASLayoutElement>)layoutElement
++ (instancetype)wrapperWithLayoutElement:(id<ASLayoutElement>)layoutElement NS_RETURNS_RETAINED
 {
   return [[self alloc] initWithLayoutElement:layoutElement];
 }
@@ -249,7 +276,7 @@ ASLayoutElementStyleExtensibilityForwarding
   return self;
 }
 
-+ (instancetype)wrapperWithLayoutElements:(NSArray<id<ASLayoutElement>> *)layoutElements
++ (instancetype)wrapperWithLayoutElements:(NSArray<id<ASLayoutElement>> *)layoutElements NS_RETURNS_RETAINED
 {
   return [[self alloc] initWithLayoutElements:layoutElements];
 }
@@ -266,7 +293,9 @@ ASLayoutElementStyleExtensibilityForwarding
 - (ASLayout *)calculateLayoutThatFits:(ASSizeRange)constrainedSize
 {
   NSArray *children = self.children;
-  NSMutableArray *sublayouts = [NSMutableArray arrayWithCapacity:children.count];
+  const auto count = children.count;
+  ASLayout *rawSublayouts[count];
+  int i = 0;
   
   CGSize size = constrainedSize.min;
   for (id<ASLayoutElement> child in children) {
@@ -276,9 +305,9 @@ ASLayoutElementStyleExtensibilityForwarding
     size.width = MAX(size.width,  sublayout.size.width);
     size.height = MAX(size.height, sublayout.size.height);
     
-    [sublayouts addObject:sublayout];
+    rawSublayouts[i++] = sublayout;
   }
-  
+  const auto sublayouts = [NSArray<ASLayout *> arrayByTransferring:rawSublayouts count:i];
   return [ASLayout layoutWithLayoutElement:self size:size sublayouts:sublayouts];
 }
 
@@ -288,7 +317,7 @@ ASLayoutElementStyleExtensibilityForwarding
 
 @implementation ASLayoutSpec (Debugging)
 
-#pragma mark - ASLayoutElementAsciiArtProtocol
+#pragma mark - ASCII Art Helpers
 
 + (NSString *)asciiArtStringForChildren:(NSArray *)children parentName:(NSString *)parentName direction:(ASStackLayoutDirection)direction
 {
@@ -309,28 +338,5 @@ ASLayoutElementStyleExtensibilityForwarding
 {
   return [self asciiArtStringForChildren:children parentName:parentName direction:ASStackLayoutDirectionHorizontal];
 }
-
-- (NSString *)asciiArtString
-{
-  NSArray *children = self.children.count < 2 && self.child ? @[self.child] : self.children;
-  return [ASLayoutSpec asciiArtStringForChildren:children parentName:[self asciiArtName]];
-}
-
-- (NSString *)asciiArtName
-{
-  NSString *string = NSStringFromClass([self class]);
-  if (_debugName) {
-    string = [string stringByAppendingString:[NSString stringWithFormat:@" (debugName = %@)",_debugName]];
-  }
-  return string;
-}
-
-@end
-
-#pragma mark - ASLayoutSpec (Deprecated)
-
-@implementation ASLayoutSpec (Deprecated)
-
-ASLayoutElementStyleForwarding
 
 @end

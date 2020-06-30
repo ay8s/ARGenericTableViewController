@@ -36,7 +36,7 @@
 {
     if (self = [super init]) {
         _maxNumberOfConcurrentDownloads = maxNumberOfConcurrentDownloads;
-        
+
         _lock = [[PINRemoteLock alloc] initWithName:@"PINRemoteImageDownloadQueue Lock"];
         _highPriorityQueuedOperations = [[NSMutableOrderedSet alloc] init];
         _defaultPriorityQueuedOperations = [[NSMutableOrderedSet alloc] init];
@@ -59,6 +59,8 @@
     [self lock];
         _maxNumberOfConcurrentDownloads = maxNumberOfConcurrentDownloads;
     [self unlock];
+    
+    [self scheduleDownloadsIfNeeded];
 }
 
 - (NSURLSessionDataTask *)addDownloadWithSessionManager:(PINURLSessionManager *)sessionManager
@@ -66,26 +68,28 @@
                                                priority:(PINRemoteImageManagerPriority)priority
                                       completionHandler:(PINRemoteImageDownloadCompletion)completionHandler
 {
-    NSURLSessionDataTask *dataTask = [sessionManager dataTaskWithRequest:request completionHandler:^(NSURLSessionTask *task, NSError *error) {
-        completionHandler(task.response, error);
-        [self lock];
-            [_runningTasks removeObject:task];
-        [self unlock];
-        
-        [self scheduleDownloadsIfNeeded];
-    }];
-    
+    NSURLSessionDataTask *dataTask = [sessionManager dataTaskWithRequest:request
+                                                                priority:priority
+                                                       completionHandler:^(NSURLSessionTask *task, NSError *error) {
+                                                           completionHandler(task.response, error);
+                                                           [self lock];
+                                                               [self->_runningTasks removeObject:task];
+                                                           [self unlock];
+
+                                                           [self scheduleDownloadsIfNeeded];
+                                                       }];
+
     [self setQueuePriority:priority forTask:dataTask addIfNecessary:YES];
-    
+
     [self scheduleDownloadsIfNeeded];
-    
+
     return dataTask;
 }
 
 - (void)scheduleDownloadsIfNeeded
 {
     [self lock];
-        if (_runningTasks.count < _maxNumberOfConcurrentDownloads) {
+        while (_runningTasks.count < _maxNumberOfConcurrentDownloads) {
             NSMutableOrderedSet <NSURLSessionDataTask *> *queue = nil;
             if (_highPriorityQueuedOperations.count > 0) {
                 queue = _highPriorityQueuedOperations;
@@ -95,13 +99,15 @@
                 queue = _lowPriorityQueuedOperations;
             }
             
-            if (queue) {
-                NSURLSessionDataTask *task = [queue firstObject];
-                [queue removeObjectAtIndex:0];
-                [task resume];
-                
-                [_runningTasks addObject:task];
+            if (!queue) {
+                break;
             }
+            
+            NSURLSessionDataTask *task = [queue firstObject];
+            [queue removeObjectAtIndex:0];
+            [task resume];
+            
+            [_runningTasks addObject:task];
         }
     [self unlock];
 }

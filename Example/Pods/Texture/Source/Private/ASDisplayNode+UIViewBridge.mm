@@ -2,26 +2,17 @@
 //  ASDisplayNode+UIViewBridge.mm
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
+#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/_ASCoreAnimationExtras.h>
 #import <AsyncDisplayKit/_ASPendingState.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkSubclasses.h>
 #import <AsyncDisplayKit/ASPendingStateController.h>
 
 /**
@@ -42,11 +33,9 @@
 
 #define DISPLAYNODE_USE_LOCKS 1
 
-#define __loaded(node) (node->_view != nil || (node->_layer != nil && node->_flags.layerBacked))
-
 #if DISPLAYNODE_USE_LOCKS
-#define _bridge_prologue_read ASDN::MutexLocker l(__instanceLock__); ASDisplayNodeAssertThreadAffinity(self)
-#define _bridge_prologue_write ASDN::MutexLocker l(__instanceLock__)
+#define _bridge_prologue_read AS::MutexLocker l(__instanceLock__); ASDisplayNodeAssertThreadAffinity(self)
+#define _bridge_prologue_write AS::MutexLocker l(__instanceLock__)
 #else
 #define _bridge_prologue_read ASDisplayNodeAssertThreadAffinity(self)
 #define _bridge_prologue_write
@@ -56,8 +45,11 @@
 /// Side Effect: Registers the node with the shared ASPendingStateController if
 /// the property cannot be immediately applied and the node does not already have pending changes.
 /// This function must be called with the node's lock already held (after _bridge_prologue_write).
+/// *warning* the lock should *not* be released until the pending state is updated if this method
+/// returns NO. Otherwise, the pending state can be scheduled and flushed *before* you get a chance
+/// to apply it.
 ASDISPLAYNODE_INLINE BOOL ASDisplayNodeShouldApplyBridgedWriteToView(ASDisplayNode *node) {
-  BOOL loaded = __loaded(node);
+  BOOL loaded = _loaded(node);
   if (ASDisplayNodeThreadIsMain()) {
     return loaded;
   } else {
@@ -68,7 +60,7 @@ ASDISPLAYNODE_INLINE BOOL ASDisplayNodeShouldApplyBridgedWriteToView(ASDisplayNo
   }
 };
 
-#define _getFromViewOrLayer(layerProperty, viewAndPendingViewStateProperty) __loaded(self) ? \
+#define _getFromViewOrLayer(layerProperty, viewAndPendingViewStateProperty) _loaded(self) ? \
   (_view ? _view.viewAndPendingViewStateProperty : _layer.layerProperty )\
  : ASDisplayNodeGetPendingState(self).viewAndPendingViewStateProperty
 
@@ -78,9 +70,9 @@ ASDISPLAYNODE_INLINE BOOL ASDisplayNodeShouldApplyBridgedWriteToView(ASDisplayNo
 #define _setToViewOnly(viewAndPendingViewStateProperty, viewAndPendingViewStateExpr) BOOL shouldApply = ASDisplayNodeShouldApplyBridgedWriteToView(self); \
 if (shouldApply) { _view.viewAndPendingViewStateProperty = (viewAndPendingViewStateExpr); } else { ASDisplayNodeGetPendingState(self).viewAndPendingViewStateProperty = (viewAndPendingViewStateExpr); }
 
-#define _getFromViewOnly(viewAndPendingViewStateProperty) __loaded(self) ? _view.viewAndPendingViewStateProperty : ASDisplayNodeGetPendingState(self).viewAndPendingViewStateProperty
+#define _getFromViewOnly(viewAndPendingViewStateProperty) _loaded(self) ? _view.viewAndPendingViewStateProperty : ASDisplayNodeGetPendingState(self).viewAndPendingViewStateProperty
 
-#define _getFromLayer(layerProperty) __loaded(self) ? _layer.layerProperty : ASDisplayNodeGetPendingState(self).layerProperty
+#define _getFromLayer(layerProperty) _loaded(self) ? _layer.layerProperty : ASDisplayNodeGetPendingState(self).layerProperty
 
 #define _setToLayer(layerProperty, layerValueExpr) BOOL shouldApply = ASDisplayNodeShouldApplyBridgedWriteToView(self); \
 if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNodeGetPendingState(self).layerProperty = (layerValueExpr); }
@@ -92,16 +84,6 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
  * without any CALayer or UIView actually existing while still being able to set and read properties from ASDisplayNode instances.
  */
 @implementation ASDisplayNode (UIViewBridge)
-
-- (BOOL)canBecomeFirstResponder
-{
-  return NO;
-}
-
-- (BOOL)canResignFirstResponder
-{
-  return YES;
-}
 
 #if TARGET_OS_TV
 // Focus Engine
@@ -143,23 +125,60 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 }
 #endif
 
-- (BOOL)isFirstResponder
+- (BOOL)canBecomeFirstResponder
 {
-  ASDisplayNodeAssertMainThread();
-  return _view != nil && [_view isFirstResponder];
+  if (_view == nil) {
+    // By default we return NO if not view is created yet
+    return NO;
+  }
+  return [_view canBecomeFirstResponder];
 }
 
-// Note: this implicitly loads the view if it hasn't been loaded yet.
 - (BOOL)becomeFirstResponder
 {
   ASDisplayNodeAssertMainThread();
-  return !self.layerBacked && [self canBecomeFirstResponder] && [self.view becomeFirstResponder];
+
+  // Note: This implicitly loads the view if it hasn't been loaded yet.
+  [self view];
+
+  if (![self canBecomeFirstResponder]) {
+    return NO;
+  }
+  return [_view becomeFirstResponder];
+}
+
+- (BOOL)canResignFirstResponder
+{
+  ASDisplayNodeAssertMainThread();
+
+  if (_view == nil) {
+    // By default we return YES if no view is created yet
+    return YES;
+  }
+  return [_view canResignFirstResponder];
 }
 
 - (BOOL)resignFirstResponder
 {
   ASDisplayNodeAssertMainThread();
-  return !self.layerBacked && [self canResignFirstResponder] && [_view resignFirstResponder];
+
+  // Note: This implicitly loads the view if it hasn't been loaded yet.
+  [self view];
+
+  if (![self canResignFirstResponder]) {
+    return NO;
+  }
+  return [_view resignFirstResponder];
+}
+
+- (BOOL)isFirstResponder
+{
+  ASDisplayNodeAssertMainThread();
+  if (_view == nil) {
+    // If no view is created yet we can just return NO as it's unlikely it's the first responder
+    return NO;
+  }
+  return [_view isFirstResponder];
 }
 
 - (BOOL)canPerformAction:(SEL)action withSender:(id)sender
@@ -182,14 +201,75 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 
 - (CGFloat)cornerRadius
 {
-  _bridge_prologue_read;
-  return _getFromLayer(cornerRadius);
+  AS::MutexLocker l(__instanceLock__);
+  return _cornerRadius;
 }
 
 - (void)setCornerRadius:(CGFloat)newCornerRadius
 {
+  [self updateCornerRoundingWithType:self.cornerRoundingType
+                        cornerRadius:newCornerRadius
+                       maskedCorners:self.maskedCorners];
+}
+
+- (ASCornerRoundingType)cornerRoundingType
+{
+  AS::MutexLocker l(__instanceLock__);
+  return _cornerRoundingType;
+}
+
+- (void)setCornerRoundingType:(ASCornerRoundingType)newRoundingType
+{
+  [self updateCornerRoundingWithType:newRoundingType cornerRadius:self.cornerRadius maskedCorners:self.maskedCorners];
+}
+
+- (CACornerMask)maskedCorners
+{
+  AS::MutexLocker l(__instanceLock__);
+  return _maskedCorners;
+}
+
+- (void)setMaskedCorners:(CACornerMask)newMaskedCorners
+{
+  [self updateCornerRoundingWithType:self.cornerRoundingType
+                        cornerRadius:self.cornerRadius
+                       maskedCorners:newMaskedCorners];
+}
+
+- (NSString *)contentsGravity
+{
+  _bridge_prologue_read;
+  return _getFromLayer(contentsGravity);
+}
+
+- (void)setContentsGravity:(NSString *)newContentsGravity
+{
   _bridge_prologue_write;
-  _setToLayer(cornerRadius, newCornerRadius);
+  _setToLayer(contentsGravity, newContentsGravity);
+}
+
+- (CGRect)contentsRect
+{
+  _bridge_prologue_read;
+  return _getFromLayer(contentsRect);
+}
+
+- (void)setContentsRect:(CGRect)newContentsRect
+{
+  _bridge_prologue_write;
+  _setToLayer(contentsRect, newContentsRect);
+}
+
+- (CGRect)contentsCenter
+{
+  _bridge_prologue_read;
+  return _getFromLayer(contentsCenter);
+}
+
+- (void)setContentsCenter:(CGRect)newContentsCenter
+{
+  _bridge_prologue_write;
+  _setToLayer(contentsCenter, newContentsCenter);
 }
 
 - (CGFloat)contentsScale
@@ -202,6 +282,18 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 {
   _bridge_prologue_write;
   _setToLayer(contentsScale, newContentsScale);
+}
+
+- (CGFloat)rasterizationScale
+{
+  _bridge_prologue_read;
+  return _getFromLayer(rasterizationScale);
+}
+
+- (void)setRasterizationScale:(CGFloat)newRasterizationScale
+{
+  _bridge_prologue_write;
+  _setToLayer(rasterizationScale, newRasterizationScale);
 }
 
 - (CGRect)bounds
@@ -237,69 +329,77 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 
 - (void)setFrame:(CGRect)rect
 {
-  _bridge_prologue_write;
-
-  // For classes like ASTableNode, ASCollectionNode, ASScrollNode and similar - make sure UIView gets setFrame:
-  struct ASDisplayNodeFlags flags = _flags;
-  BOOL specialPropertiesHandling = ASDisplayNodeNeedsSpecialPropertiesHandling(checkFlag(Synchronous), flags.layerBacked);
-
-  BOOL nodeLoaded = __loaded(self);
+  BOOL setToView = NO;
+  BOOL setToLayer = NO;
+  CGRect newBounds = CGRectZero;
+  CGPoint newPosition = CGPointZero;
+  BOOL nodeLoaded = NO;
   BOOL isMainThread = ASDisplayNodeThreadIsMain();
-  if (!specialPropertiesHandling) {
-    BOOL canReadProperties = isMainThread || !nodeLoaded;
-    if (canReadProperties) {
-      // We don't have to set frame directly, and we can read current properties.
-      // Compute a new bounds and position and set them on self.
-      CALayer *layer = _layer;
-      BOOL useLayer = (layer != nil);
-      CGPoint origin = (useLayer ? layer.bounds.origin : self.bounds.origin);
-      CGPoint anchorPoint = (useLayer ? layer.anchorPoint : self.anchorPoint);
+  {
+    _bridge_prologue_write;
 
-      CGRect newBounds = CGRectZero;
-      CGPoint newPosition = CGPointZero;
-      ASBoundsAndPositionForFrame(rect, origin, anchorPoint, &newBounds, &newPosition);
+    // For classes like ASTableNode, ASCollectionNode, ASScrollNode and similar - make sure UIView gets setFrame:
+    struct ASDisplayNodeFlags flags = _flags;
+    BOOL specialPropertiesHandling = ASDisplayNodeNeedsSpecialPropertiesHandling(checkFlag(Synchronous), flags.layerBacked);
 
-      if (ASIsCGRectValidForLayout(newBounds) == NO || ASIsCGPositionValidForLayout(newPosition) == NO) {
-        ASDisplayNodeAssertNonFatal(NO, @"-[ASDisplayNode setFrame:] - The new frame (%@) is invalid and unsafe to be set.", NSStringFromCGRect(rect));
-        return;
-      }
-      
-      if (useLayer) {
-        layer.bounds = newBounds;
-        layer.position = newPosition;
+    nodeLoaded = _loaded(self);
+    if (!specialPropertiesHandling) {
+      BOOL canReadProperties = isMainThread || !nodeLoaded;
+      if (canReadProperties) {
+        // We don't have to set frame directly, and we can read current properties.
+        // Compute a new bounds and position and set them on self.
+        CALayer *layer = _layer;
+        CGPoint origin = (nodeLoaded ? layer.bounds.origin : self.bounds.origin);
+        CGPoint anchorPoint = (nodeLoaded ? layer.anchorPoint : self.anchorPoint);
+
+        ASBoundsAndPositionForFrame(rect, origin, anchorPoint, &newBounds, &newPosition);
+
+        if (ASIsCGRectValidForLayout(newBounds) == NO || ASIsCGPositionValidForLayout(newPosition) == NO) {
+          ASDisplayNodeAssertNonFatal(NO, @"-[ASDisplayNode setFrame:] - The new frame (%@) is invalid and unsafe to be set.", NSStringFromCGRect(rect));
+          return;
+        }
+
+        if (nodeLoaded) {
+          setToLayer = YES;
+        } else {
+          self.bounds = newBounds;
+          self.position = newPosition;
+        }
       } else {
-        self.bounds = newBounds;
-        self.position = newPosition;
+        // We don't have to set frame directly, but we can't read properties.
+        // Store the frame in our pending state, and it'll get decomposed into
+        // bounds and position when the pending state is applied.
+        _ASPendingState *pendingState = ASDisplayNodeGetPendingState(self);
+        if (nodeLoaded && !pendingState.hasChanges) {
+          [[ASPendingStateController sharedInstance] registerNode:self];
+        }
+        pendingState.frame = rect;
       }
     } else {
-      // We don't have to set frame directly, but we can't read properties.
-      // Store the frame in our pending state, and it'll get decomposed into
-      // bounds and position when the pending state is applied.
-      _ASPendingState *pendingState = ASDisplayNodeGetPendingState(self);
-      if (nodeLoaded && !pendingState.hasChanges) {
-        [[ASPendingStateController sharedInstance] registerNode:self];
+      if (nodeLoaded && isMainThread) {
+        // We do have to set frame directly, and we're on main thread with a loaded node.
+        // Just set the frame on the view.
+        // NOTE: Frame is only defined when transform is identity because we explicitly diverge from CALayer behavior and define frame without transform.
+        setToView = YES;
+      } else {
+        // We do have to set frame directly, but either the node isn't loaded or we're on a non-main thread.
+        // Set the frame on the pending state, and it'll call setFrame: when applied.
+        _ASPendingState *pendingState = ASDisplayNodeGetPendingState(self);
+        if (nodeLoaded && !pendingState.hasChanges) {
+          [[ASPendingStateController sharedInstance] registerNode:self];
+        }
+        pendingState.frame = rect;
       }
-      pendingState.frame = rect;
     }
-  } else {
-    if (nodeLoaded && isMainThread) {
-      // We do have to set frame directly, and we're on main thread with a loaded node.
-      // Just set the frame on the view.
-      // NOTE: Frame is only defined when transform is identity because we explicitly diverge from CALayer behavior and define frame without transform.
-//#if DEBUG
-//      // Checking if the transform is identity is expensive, so disable when unnecessary. We have assertions on in Release, so DEBUG is the only way I know of.
-//      ASDisplayNodeAssert(CATransform3DIsIdentity(self.transform), @"-[ASDisplayNode setFrame:] - self.transform must be identity in order to set the frame property.  (From Apple's UIView documentation: If the transform property is not the identity transform, the value of this property is undefined and therefore should be ignored.)");
-//#endif
-      _view.frame = rect;
-    } else {
-      // We do have to set frame directly, but either the node isn't loaded or we're on a non-main thread.
-      // Set the frame on the pending state, and it'll call setFrame: when applied.
-      _ASPendingState *pendingState = ASDisplayNodeGetPendingState(self);
-      if (nodeLoaded && !pendingState.hasChanges) {
-        [[ASPendingStateController sharedInstance] registerNode:self];
-      }
-      pendingState.frame = rect;
-    }
+  }
+
+  if (setToView) {
+    ASDisplayNodeAssertTrue(nodeLoaded && isMainThread);
+    _view.frame = rect;
+  } else if (setToLayer) {
+    ASDisplayNodeAssertTrue(nodeLoaded && isMainThread);
+    _layer.bounds = newBounds;
+    _layer.position = newPosition;
   }
 }
 
@@ -313,6 +413,11 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
     isRasterized = _hierarchyState & ASHierarchyStateRasterized;
     shouldApply = ASDisplayNodeShouldApplyBridgedWriteToView(self);
     viewOrLayer = _view ?: _layer;
+    
+    if (isRasterized == NO && shouldApply == NO) {
+      // We can't release the lock before applying to pending state, or it may be flushed before it can be applied.
+      [ASDisplayNodeGetPendingState(self) setNeedsDisplay];
+    }
   }
   
   if (isRasterized) {
@@ -337,9 +442,6 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
       // message to the view/layer first. This is because __setNeedsDisplay calls as scheduleNodeForDisplay,
       // which may call -displayIfNeeded. We want to ensure the needsDisplay flag is set now, and then cleared.
       [viewOrLayer setNeedsDisplay];
-    } else {
-      _bridge_prologue_write;
-      [ASDisplayNodeGetPendingState(self) setNeedsDisplay];
     }
     [self __setNeedsDisplay];
   }
@@ -353,8 +455,15 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
   {
     _bridge_prologue_write;
     shouldApply = ASDisplayNodeShouldApplyBridgedWriteToView(self);
-    loaded = __loaded(self);
+    loaded = _loaded(self);
     viewOrLayer = _view ?: _layer;
+    if (shouldApply == NO && loaded) {
+      // The node is loaded but we're not on main.
+      // We will call [self __setNeedsLayout] when we apply the pending state.
+      // We need to call it on main if the node is loaded to support automatic subnode management.
+      // We can't release the lock before applying to pending state, or it may be flushed before it can be applied.
+      [ASDisplayNodeGetPendingState(self) setNeedsLayout];
+    }
   }
   
   if (shouldApply) {
@@ -363,13 +472,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
     // the view or layer to ensure that measurement and implicitly added subnodes have been handled.
     [self __setNeedsLayout];
     [viewOrLayer setNeedsLayout];
-  } else if (loaded) {
-    // The node is loaded but we're not on main.
-    // We will call [self __setNeedsLayout] when we apply the pending state.
-    // We need to call it on main if the node is loaded to support automatic subnode management.
-    _bridge_prologue_write;
-    [ASDisplayNodeGetPendingState(self) setNeedsLayout];
-  } else {
+  } else if (loaded == NO) {
     // The node is not loaded and we're not on main.
     [self __setNeedsLayout];
   }
@@ -383,21 +486,22 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
   {
     _bridge_prologue_write;
     shouldApply = ASDisplayNodeShouldApplyBridgedWriteToView(self);
-    loaded = __loaded(self);
+    loaded = _loaded(self);
     viewOrLayer = _view ?: _layer;
+    if (shouldApply == NO && loaded) {
+      // The node is loaded but we're not on main.
+      // We will call layoutIfNeeded on the view or layer when we apply the pending state. __layout will in turn be called on us (see -[_ASDisplayLayer layoutSublayers]).
+      // We need to call it on main if the node is loaded to support automatic subnode management.
+      // We can't release the lock before applying to pending state, or it may be flushed before it can be applied.
+      [ASDisplayNodeGetPendingState(self) layoutIfNeeded];
+    }
   }
   
   if (shouldApply) {
     // The node is loaded and we're on main.
     // Message the view or layer which in turn will call __layout on us (see -[_ASDisplayLayer layoutSublayers]).
     [viewOrLayer layoutIfNeeded];
-  } else if (loaded) {
-    // The node is loaded but we're not on main.
-    // We will call layoutIfNeeded on the view or layer when we apply the pending state. __layout will in turn be called on us (see -[_ASDisplayLayer layoutSublayers]).
-    // We need to call it on main if the node is loaded to support automatic subnode management.
-    _bridge_prologue_write;
-    [ASDisplayNodeGetPendingState(self) layoutIfNeeded];
-  } else {
+  } else if (loaded == NO) {
     // The node is not loaded and we're not on main.
     [self __layout];
   }
@@ -406,17 +510,32 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 - (BOOL)isOpaque
 {
   _bridge_prologue_read;
-  return _getFromLayer(opaque);
+  return _getFromViewOrLayer(opaque, opaque);
 }
+
 
 - (void)setOpaque:(BOOL)newOpaque
 {
   _bridge_prologue_write;
-  
   BOOL shouldApply = ASDisplayNodeShouldApplyBridgedWriteToView(self);
   
   if (shouldApply) {
+    /*
+     NOTE: The values of `opaque` can be different between a view and layer.
+
+     In debugging on Xcode 11 I saw the following in lldb:
+     - Initially for a new ASDisplayNode layer.isOpaque and _view.isOpaque are true
+     - Set the backgroundColor of the node to a valid UIColor
+     Expected: layer.isOpaque and view.isOpaque would be equal and true
+     Actual: view.isOpaque is true and layer.isOpaque is now false
+
+     This broke some unit tests for view-backed nodes so I think we need to read directly from the view and can't rely on the layers value at this point.
+     */
     BOOL oldOpaque = _layer.opaque;
+    if (!_flags.layerBacked) {
+      oldOpaque = _view.opaque;
+      _view.opaque = newOpaque;
+    }
     _layer.opaque = newOpaque;
     if (oldOpaque != newOpaque) {
       [self setNeedsDisplay];
@@ -593,7 +712,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 - (UIViewContentMode)contentMode
 {
   _bridge_prologue_read;
-  if (__loaded(self)) {
+  if (_loaded(self)) {
     if (_flags.layerBacked) {
       return ASDisplayNodeUIContentModeFromCAContentsGravity(_layer.contentsGravity);
     } else {
@@ -622,49 +741,92 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 - (UIColor *)backgroundColor
 {
   _bridge_prologue_read;
-  return [UIColor colorWithCGColor:_getFromLayer(backgroundColor)];
+  if (_loaded(self)) {
+    /*
+     Note: We can no longer rely simply on the layers backgroundColor value if the color is set directly on `_view`
+     There is no longer a 1:1 mapping between _view.backgroundColor and _layer.backgroundColor after testing in iOS 13 / Xcode 11 so we should prefer one or the other depending on the backing type for the node (view or layer)
+     */
+    if (_flags.layerBacked) {
+      return _backgroundColor;
+    } else {
+      return _view.backgroundColor;
+    }
+  }
+  return ASDisplayNodeGetPendingState(self).backgroundColor;
 }
 
 - (void)setBackgroundColor:(UIColor *)newBackgroundColor
 {
   _bridge_prologue_write;
-  
-  CGColorRef newBackgroundCGColor = [newBackgroundColor CGColor];
   BOOL shouldApply = ASDisplayNodeShouldApplyBridgedWriteToView(self);
-  
   if (shouldApply) {
-    CGColorRef oldBackgroundCGColor = _layer.backgroundColor;
-    
-    BOOL specialPropertiesHandling = ASDisplayNodeNeedsSpecialPropertiesHandling(checkFlag(Synchronous), _flags.layerBacked);
-    if (specialPropertiesHandling) {
-        _view.backgroundColor = newBackgroundColor;
+    UIColor *oldBackgroundColor = _backgroundColor;
+    _backgroundColor = newBackgroundColor;
+    if (_flags.layerBacked) {
+      _layer.backgroundColor = _backgroundColor.CGColor;
     } else {
-        _layer.backgroundColor = newBackgroundCGColor;
+      /*
+       NOTE: Setting to the view and layer individually is necessary.
+
+       As observed in lldb, the view does not appear to immediately propagate background color to the layer and actually clears it's value (`nil`) initially. This was caught by our snapshot tests.
+
+       Given that UIColor / UIView has dynamic capabilties now, we should set directly to the view and make sure that the layers value is consistent here.
+
+       */
+      _view.backgroundColor = _backgroundColor;
+      // Gather the CGColorRef from the view incase there are any changes it might apply to which CGColorRef is returned for dynamic colors
+      _layer.backgroundColor = _view.backgroundColor.CGColor;
     }
-      
-    if (!CGColorEqualToColor(oldBackgroundCGColor, newBackgroundCGColor)) {
+
+    if (![oldBackgroundColor isEqual:newBackgroundColor]) {
       [self setNeedsDisplay];
     }
   } else {
     // NOTE: If we're in the background, we cannot read the current value of bgcolor (if loaded).
     // When the pending state is applied to the view on main, we will call `setNeedsDisplay` if
     // the new background color doesn't match the one on the layer.
-    ASDisplayNodeGetPendingState(self).backgroundColor = newBackgroundCGColor;
+    _backgroundColor = newBackgroundColor;
+    ASDisplayNodeGetPendingState(self).backgroundColor = newBackgroundColor;
   }
 }
 
 - (UIColor *)tintColor
 {
-  _bridge_prologue_read;
-  ASDisplayNodeAssert(!_flags.layerBacked, @"Danger: this property is undefined on layer-backed nodes.");
-  return _getFromViewOnly(tintColor);
+  __instanceLock__.lock();
+  UIColor *retVal = nil;
+  BOOL shouldAscend = NO;
+  if (_flags.layerBacked) {
+    retVal = _tintColor;
+    // The first nondefault tint color value in the node’s hierarchy, ascending from and starting with the node itself.
+    shouldAscend = (retVal == nil);
+  } else {
+    ASDisplayNodeAssertThreadAffinity(self);
+    retVal = _getFromViewOnly(tintColor);
+  }
+  __instanceLock__.unlock();
+  return shouldAscend ? self.supernode.tintColor : retVal;
 }
 
 - (void)setTintColor:(UIColor *)color
 {
-  _bridge_prologue_write;
-  ASDisplayNodeAssert(!_flags.layerBacked, @"Danger: this property is undefined on layer-backed nodes.");
-  _setToViewOnly(tintColor, color);
+  // Handle locking manually since we unlock to notify subclasses when tint color changes
+  __instanceLock__.lock();
+  if (_flags.layerBacked) {
+    if (![_tintColor isEqual:color]) {
+      _tintColor = color;
+
+      if (_loaded(self)) {
+        // Tint color has changed. Unlock here before calling subclasses and exit-early
+        __instanceLock__.unlock();
+        [self tintColorDidChange];
+        return;
+      }
+    }
+  } else {
+    _tintColor = color;
+    _setToViewOnly(tintColor, color);
+  }
+  __instanceLock__.unlock();
 }
 
 - (void)tintColorDidChange
@@ -768,13 +930,13 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
   _setToLayer(allowsEdgeAntialiasing, allowsEdgeAntialiasing);
 }
 
-- (unsigned int)edgeAntialiasingMask
+- (CAEdgeAntialiasingMask)edgeAntialiasingMask
 {
   _bridge_prologue_read;
   return _getFromLayer(edgeAntialiasingMask);
 }
 
-- (void)setEdgeAntialiasingMask:(unsigned int)edgeAntialiasingMask
+- (void)setEdgeAntialiasingMask:(CAEdgeAntialiasingMask)edgeAntialiasingMask
 {
   _bridge_prologue_write;
   _setToLayer(edgeAntialiasingMask, edgeAntialiasingMask);
@@ -783,25 +945,176 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 - (UISemanticContentAttribute)semanticContentAttribute
 {
   _bridge_prologue_read;
-  if (AS_AT_LEAST_IOS9) {
-    return _getFromViewOnly(semanticContentAttribute);
-  }
-  return UISemanticContentAttributeUnspecified;
+  return _getFromViewOnly(semanticContentAttribute);
 }
 
 - (void)setSemanticContentAttribute:(UISemanticContentAttribute)semanticContentAttribute
 {
   _bridge_prologue_write;
-  if (AS_AT_LEAST_IOS9) {
-    _setToViewOnly(semanticContentAttribute, semanticContentAttribute);
+  _setToViewOnly(semanticContentAttribute, semanticContentAttribute);
 #if YOGA
-    [self semanticContentAttributeDidChange:semanticContentAttribute];
+  [self semanticContentAttributeDidChange:semanticContentAttribute];
 #endif
+}
+
+- (UIEdgeInsets)layoutMargins
+{
+  _bridge_prologue_read;
+  ASDisplayNodeAssert(!_flags.layerBacked, @"Danger: this property is undefined on layer-backed nodes.");
+  UIEdgeInsets margins = _getFromViewOnly(layoutMargins);
+
+  if (!AS_AT_LEAST_IOS11 && self.insetsLayoutMarginsFromSafeArea) {
+    UIEdgeInsets safeArea = self.safeAreaInsets;
+    margins = ASConcatInsets(margins, safeArea);
   }
+
+  return margins;
+}
+
+- (void)setLayoutMargins:(UIEdgeInsets)layoutMargins
+{
+  _bridge_prologue_write;
+  ASDisplayNodeAssert(!_flags.layerBacked, @"Danger: this property is undefined on layer-backed nodes.");
+  _setToViewOnly(layoutMargins, layoutMargins);
+}
+
+- (BOOL)preservesSuperviewLayoutMargins
+{
+  _bridge_prologue_read;
+  ASDisplayNodeAssert(!_flags.layerBacked, @"Danger: this property is undefined on layer-backed nodes.");
+  return _getFromViewOnly(preservesSuperviewLayoutMargins);
+}
+
+- (void)setPreservesSuperviewLayoutMargins:(BOOL)preservesSuperviewLayoutMargins
+{
+  _bridge_prologue_write;
+  ASDisplayNodeAssert(!_flags.layerBacked, @"Danger: this property is undefined on layer-backed nodes.");
+  _setToViewOnly(preservesSuperviewLayoutMargins, preservesSuperviewLayoutMargins);
+}
+
+- (void)layoutMarginsDidChange
+{
+  ASDisplayNodeAssertMainThread();
+
+  if (self.automaticallyRelayoutOnLayoutMarginsChanges) {
+    [self setNeedsLayout];
+  }
+}
+
+- (UIEdgeInsets)safeAreaInsets
+{
+  _bridge_prologue_read;
+
+  if (AS_AVAILABLE_IOS_TVOS(11.0, 11.0)) {
+    if (!_flags.layerBacked && _loaded(self)) {
+      return self.view.safeAreaInsets;
+    }
+  }
+  return _fallbackSafeAreaInsets;
+}
+
+- (BOOL)insetsLayoutMarginsFromSafeArea
+{
+  _bridge_prologue_read;
+
+  return [self _locked_insetsLayoutMarginsFromSafeArea];
+}
+
+- (void)setInsetsLayoutMarginsFromSafeArea:(BOOL)insetsLayoutMarginsFromSafeArea
+{
+  ASDisplayNodeAssertThreadAffinity(self);
+  BOOL shouldNotifyAboutUpdate;
+  {
+    _bridge_prologue_write;
+
+    _flags.fallbackInsetsLayoutMarginsFromSafeArea = insetsLayoutMarginsFromSafeArea;
+
+    if (AS_AVAILABLE_IOS_TVOS(11.0, 11.0)) {
+      if (!_flags.layerBacked) {
+        _setToViewOnly(insetsLayoutMarginsFromSafeArea, insetsLayoutMarginsFromSafeArea);
+      }
+    }
+
+    shouldNotifyAboutUpdate = _loaded(self) && (!AS_AT_LEAST_IOS11 || _flags.layerBacked);
+  }
+
+  if (shouldNotifyAboutUpdate) {
+    [self layoutMarginsDidChange];
+  }
+}
+
+- (NSDictionary<NSString *,id<CAAction>> *)actions
+{
+  _bridge_prologue_read;
+  return _getFromLayer(actions);
+}
+
+- (void)setActions:(NSDictionary<NSString *,id<CAAction>> *)actions
+{
+  _bridge_prologue_write;
+  _setToLayer(actions, actions);
+}
+
+- (void)safeAreaInsetsDidChange
+{
+  ASDisplayNodeAssertMainThread();
+
+  if (self.automaticallyRelayoutOnSafeAreaChanges) {
+    [self setNeedsLayout];
+  }
+
+  [self _fallbackUpdateSafeAreaOnChildren];
 }
 
 @end
 
+@implementation ASDisplayNode (InternalPropertyBridge)
+
+- (CGFloat)layerCornerRadius
+{
+  _bridge_prologue_read;
+  return _getFromLayer(cornerRadius);
+}
+
+- (void)setLayerCornerRadius:(CGFloat)newLayerCornerRadius
+{
+  _bridge_prologue_write;
+  _setToLayer(cornerRadius, newLayerCornerRadius);
+}
+
+- (CACornerMask)layerMaskedCorners
+{
+  _bridge_prologue_read;
+  if (AS_AVAILABLE_IOS_TVOS(11, 11)) {
+    return _getFromLayer(maskedCorners);
+  } else {
+    return kASCACornerAllCorners;
+  }
+}
+
+- (void)setLayerMaskedCorners:(CACornerMask)newLayerMaskedCorners
+{
+  _bridge_prologue_write;
+  if (AS_AVAILABLE_IOS_TVOS(11, 11)) {
+    _setToLayer(maskedCorners, newLayerMaskedCorners);
+  } else {
+    ASDisplayNodeAssert(newLayerMaskedCorners == kASCACornerAllCorners,
+                        @"Cannot change maskedCorners property in iOS < 11 while using DefaultSlowCALayer rounding.");
+  }
+}
+
+- (BOOL)_locked_insetsLayoutMarginsFromSafeArea
+{
+  DISABLED_ASAssertLocked(__instanceLock__);
+  if (AS_AVAILABLE_IOS_TVOS(11.0, 11.0)) {
+    if (!_flags.layerBacked) {
+      return _getFromViewOnly(insetsLayoutMarginsFromSafeArea);
+    }
+  }
+  return _flags.fallbackInsetsLayoutMarginsFromSafeArea;
+}
+
+@end
 
 #pragma mark - UIViewBridgeAccessibility
 
@@ -814,7 +1127,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 // - In case the node is loaded
 //  - Check if the node has a view and get the value from the view if loaded or from the pending state
 //  - If view is not available, e.g. the node is layer backed return the property value
-#define _getAccessibilityFromViewOrProperty(nodeProperty, viewAndPendingViewStateProperty) __loaded(self) ? \
+#define _getAccessibilityFromViewOrProperty(nodeProperty, viewAndPendingViewStateProperty) _loaded(self) ? \
 (_view ? _view.viewAndPendingViewStateProperty : nodeProperty )\
 : ASDisplayNodeGetPendingState(self).viewAndPendingViewStateProperty
 
@@ -824,16 +1137,32 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
 
 @implementation ASDisplayNode (UIViewBridgeAccessibility)
 
+// Walks up the view tree to nil out all the cached accsesibilityElements. This is required when changing
+// accessibility properties like accessibilityViewIsModal.
+- (void)invalidateAccessibilityElements
+{
+  // If we are not caching accessibilityElements we don't need to do anything here.
+  if (ASActivateExperimentalFeature(ASExperimentalDoNotCacheAccessibilityElements)) {
+    return;
+  }
+  
+  // we want to check if we are on the main thread first, since _loaded checks the layer and can only be done on main
+  if (ASDisplayNodeThreadIsMain() && _loaded(self)) {
+    self.view.accessibilityElements = nil;
+    [self.supernode invalidateAccessibilityElements];
+  }
+}
+
 - (BOOL)isAccessibilityElement
 {
   _bridge_prologue_read;
-  return _getAccessibilityFromViewOrProperty(_isAccessibilityElement, isAccessibilityElement);
+  return _getAccessibilityFromViewOrProperty(_flags.isAccessibilityElement, isAccessibilityElement);
 }
 
 - (void)setIsAccessibilityElement:(BOOL)isAccessibilityElement
 {
   _bridge_prologue_write;
-  _setAccessibilityToViewAndProperty(_isAccessibilityElement, isAccessibilityElement, isAccessibilityElement, isAccessibilityElement);
+  _setAccessibilityToViewAndProperty(_flags.isAccessibilityElement, isAccessibilityElement, isAccessibilityElement, isAccessibilityElement);
 }
 
 - (NSString *)accessibilityLabel
@@ -845,7 +1174,36 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
 - (void)setAccessibilityLabel:(NSString *)accessibilityLabel
 {
   _bridge_prologue_write;
+  NSString *oldAccessibilityLabel = _getFromViewOnly(accessibilityLabel);
   _setAccessibilityToViewAndProperty(_accessibilityLabel, accessibilityLabel, accessibilityLabel, accessibilityLabel);
+  if (AS_AVAILABLE_IOS_TVOS(11, 11)) {
+    NSAttributedString *accessibilityAttributedLabel = accessibilityLabel ? [[NSAttributedString alloc] initWithString:accessibilityLabel] : nil;
+    _setAccessibilityToViewAndProperty(_accessibilityAttributedLabel, accessibilityAttributedLabel, accessibilityAttributedLabel, accessibilityAttributedLabel);
+  }
+
+  // We need to update action name when it's changed to reflect the latest state.
+  // Note: Update the custom action itself won't work when a11y is inside a list of custom actions
+  // in which one action results in a name change in the next action. In that case the UIAccessibility
+  // will hold the old action strongly until a11y jumps out of the list of custom actions.
+  // Thus we can only update name in place to have the change take effect.
+  BOOL needsUpdateActionName = self.isNodeLoaded && ![oldAccessibilityLabel isEqualToString:accessibilityLabel] && (0 != (_accessibilityTraits & ASInteractiveAccessibilityTraitsMask()));
+  if (needsUpdateActionName) {
+    self.accessibilityCustomAction.name = accessibilityLabel;
+  }
+}
+
+
+- (NSAttributedString *)accessibilityAttributedLabel
+{
+  _bridge_prologue_read;
+  return _getAccessibilityFromViewOrProperty(_accessibilityAttributedLabel, accessibilityAttributedLabel);
+}
+
+- (void)setAccessibilityAttributedLabel:(NSAttributedString *)accessibilityAttributedLabel
+{
+  _bridge_prologue_write;
+  { _setAccessibilityToViewAndProperty(_accessibilityAttributedLabel, accessibilityAttributedLabel, accessibilityAttributedLabel, accessibilityAttributedLabel); }
+  { _setAccessibilityToViewAndProperty(_accessibilityLabel, accessibilityAttributedLabel.string, accessibilityLabel, accessibilityAttributedLabel.string); }
 }
 
 - (NSString *)accessibilityHint
@@ -858,6 +1216,24 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
 {
   _bridge_prologue_write;
   _setAccessibilityToViewAndProperty(_accessibilityHint, accessibilityHint, accessibilityHint, accessibilityHint);
+  if (AS_AVAILABLE_IOS_TVOS(11, 11)) {
+    NSAttributedString *accessibilityAttributedHint = accessibilityHint ? [[NSAttributedString alloc] initWithString:accessibilityHint] : nil;
+    _setAccessibilityToViewAndProperty(_accessibilityAttributedHint, accessibilityAttributedHint, accessibilityAttributedHint, accessibilityAttributedHint);
+  }
+}
+
+- (NSAttributedString *)accessibilityAttributedHint
+{
+  _bridge_prologue_read;
+  return _getAccessibilityFromViewOrProperty(_accessibilityAttributedHint, accessibilityAttributedHint);
+}
+
+- (void)setAccessibilityAttributedHint:(NSAttributedString *)accessibilityAttributedHint
+{
+  _bridge_prologue_write;
+  { _setAccessibilityToViewAndProperty(_accessibilityAttributedHint, accessibilityAttributedHint, accessibilityAttributedHint, accessibilityAttributedHint); }
+
+  { _setAccessibilityToViewAndProperty(_accessibilityHint, accessibilityAttributedHint.string, accessibilityHint, accessibilityAttributedHint.string); }
 }
 
 - (NSString *)accessibilityValue
@@ -870,6 +1246,23 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
 {
   _bridge_prologue_write;
   _setAccessibilityToViewAndProperty(_accessibilityValue, accessibilityValue, accessibilityValue, accessibilityValue);
+  if (AS_AVAILABLE_IOS_TVOS(11, 11)) {
+    NSAttributedString *accessibilityAttributedValue = accessibilityValue ? [[NSAttributedString alloc] initWithString:accessibilityValue] : nil;
+    _setAccessibilityToViewAndProperty(_accessibilityAttributedValue, accessibilityAttributedValue, accessibilityAttributedValue, accessibilityAttributedValue);
+  }
+}
+
+- (NSAttributedString *)accessibilityAttributedValue
+{
+  _bridge_prologue_read;
+  return _getAccessibilityFromViewOrProperty(_accessibilityAttributedValue, accessibilityAttributedValue);
+}
+
+- (void)setAccessibilityAttributedValue:(NSAttributedString *)accessibilityAttributedValue
+{
+  _bridge_prologue_write;
+  { _setAccessibilityToViewAndProperty(_accessibilityAttributedValue, accessibilityAttributedValue, accessibilityAttributedValue, accessibilityAttributedValue); }
+  { _setAccessibilityToViewAndProperty(_accessibilityValue, accessibilityAttributedValue.string, accessibilityValue, accessibilityAttributedValue.string); }
 }
 
 - (UIAccessibilityTraits)accessibilityTraits
@@ -911,37 +1304,50 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
 - (BOOL)accessibilityElementsHidden
 {
   _bridge_prologue_read;
-  return _getAccessibilityFromViewOrProperty(_accessibilityElementsHidden, accessibilityElementsHidden);
+  return _getAccessibilityFromViewOrProperty(_flags.accessibilityElementsHidden, accessibilityElementsHidden);
 }
 
 - (void)setAccessibilityElementsHidden:(BOOL)accessibilityElementsHidden
 {
   _bridge_prologue_write;
-  _setAccessibilityToViewAndProperty(_accessibilityElementsHidden, accessibilityElementsHidden, accessibilityElementsHidden, accessibilityElementsHidden);
+  BOOL oldHiddenValue = _getFromViewOnly(accessibilityElementsHidden);
+  _setAccessibilityToViewAndProperty(_flags.accessibilityElementsHidden, accessibilityElementsHidden, accessibilityElementsHidden, accessibilityElementsHidden);
+
+  // if we made a change, we need to clear the view's accessibilityElements cache.
+  if (!ASActivateExperimentalFeature(ASExperimentalDoNotCacheAccessibilityElements) && self.isNodeLoaded && oldHiddenValue != accessibilityElementsHidden) {
+    [self invalidateAccessibilityElements];
+  }
 }
 
 - (BOOL)accessibilityViewIsModal
 {
   _bridge_prologue_read;
-  return _getAccessibilityFromViewOrProperty(_accessibilityViewIsModal, accessibilityViewIsModal);
+  return _getAccessibilityFromViewOrProperty(_flags.accessibilityViewIsModal, accessibilityViewIsModal);
 }
 
 - (void)setAccessibilityViewIsModal:(BOOL)accessibilityViewIsModal
 {
   _bridge_prologue_write;
-  _setAccessibilityToViewAndProperty(_accessibilityViewIsModal, accessibilityViewIsModal, accessibilityViewIsModal, accessibilityViewIsModal);
+  BOOL oldAccessibilityViewIsModal = _getFromViewOnly(accessibilityViewIsModal);
+  _setAccessibilityToViewAndProperty(_flags.accessibilityViewIsModal, accessibilityViewIsModal, accessibilityViewIsModal, accessibilityViewIsModal);
+  
+  // if we made a change, we need to clear the view's accessibilityElements cache.
+  if (!ASActivateExperimentalFeature(ASExperimentalDoNotCacheAccessibilityElements) && self.isNodeLoaded && oldAccessibilityViewIsModal != accessibilityViewIsModal) {
+    [self invalidateAccessibilityElements];
+  }
 }
+
 
 - (BOOL)shouldGroupAccessibilityChildren
 {
   _bridge_prologue_read;
-  return _getAccessibilityFromViewOrProperty(_shouldGroupAccessibilityChildren, shouldGroupAccessibilityChildren);
+  return _getAccessibilityFromViewOrProperty(_flags.shouldGroupAccessibilityChildren, shouldGroupAccessibilityChildren);
 }
 
 - (void)setShouldGroupAccessibilityChildren:(BOOL)shouldGroupAccessibilityChildren
 {
   _bridge_prologue_write;
-  _setAccessibilityToViewAndProperty(_shouldGroupAccessibilityChildren, shouldGroupAccessibilityChildren, shouldGroupAccessibilityChildren, shouldGroupAccessibilityChildren);
+  _setAccessibilityToViewAndProperty(_flags.shouldGroupAccessibilityChildren, shouldGroupAccessibilityChildren, shouldGroupAccessibilityChildren, shouldGroupAccessibilityChildren);
 }
 
 - (NSString *)accessibilityIdentifier
@@ -966,6 +1372,18 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
 {
   _bridge_prologue_read;
   return _getAccessibilityFromViewOrProperty(_accessibilityNavigationStyle, accessibilityNavigationStyle);
+}
+
+- (void)setAccessibilityCustomActions:(NSArray *)accessibilityCustomActions
+{
+  _bridge_prologue_write;
+  _setAccessibilityToViewAndProperty(_accessibilityCustomActions, accessibilityCustomActions, accessibilityCustomActions, accessibilityCustomActions);
+}
+
+- (NSArray *)accessibilityCustomActions
+{
+  _bridge_prologue_read;
+  return _getAccessibilityFromViewOrProperty(_accessibilityCustomActions, accessibilityCustomActions);
 }
 
 #if TARGET_OS_TV

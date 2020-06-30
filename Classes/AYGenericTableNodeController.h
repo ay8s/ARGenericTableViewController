@@ -24,7 +24,7 @@
 #import "AYTableNodeData.h"
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
 
-@interface AYGenericTableNodeController : ASViewController <ASTableDelegate, ASTableDataSource, AYTableNodeDataDelegate>
+@interface AYGenericTableNodeController : ASDKViewController <ASTableDelegate, ASTableDataSource, AYTableNodeDataDelegate>
 
 @property (nonatomic, strong) ASTableNode *tableNode;
 
